@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { Card } from "../../components/ui/Card/Card.style";
 import { Input } from "../../components/ui/Input/input.style";
-import Button from "../../components/ui/Button/ButtonLogin"; 
+import Button from "../../components/ui/Button/Button";
 import { TitleL } from "../../styles/style";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { theme } from "../../styles/theme";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 function Login() {
   const { t } = useTranslation();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const [errors, setErrors] = useState({
     email: false,
@@ -21,78 +20,85 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newErrors = {
-      email: email.trim() === "",
-      password: password.trim() === "",
-    };
+    const formData = new FormData(e.target);
+    const email = formData.get("email")?.trim();
+    const password = formData.get("password")?.trim();
 
+    const newErrors = {
+      email: !email,
+      password: !password,
+    };
     setErrors(newErrors);
 
-    const isValid = !Object.values(newErrors).includes(true);
-    if (isValid) {
-      setEmail("");
-      setPassword("");
-      setErrors({ email: false, password: false });
-    }
-  };
+    if (newErrors.email || newErrors.password) return;
 
-  const inputs = [
-    { value: email, setValue: setEmail, placeholder: t("Email address"), error: errors.email, type: "email", message: t("Bo‘sh bo‘lishi mumkin emas") },
-    { value: password, setValue: setPassword, placeholder: t("Password"), error: errors.password, type: "password", message: t("Bo‘sh bo‘lishi mumkin emas") }
-  ];
+    console.log("LOGIN DATA:", { email, password });
+
+    toast.success("Kirish muvaffaqiyatli!");  
+
+    e.target.reset();
+    setErrors({ email: false, password: false });
+
+    navigate("/");  
+  };
 
   return (
     <div className="login">
       <Card>
-        <TitleL>{t("Kirish")}</TitleL>
+        <TitleL>{t("Login")}</TitleL>
 
         <form className="label" onSubmit={handleSubmit}>
-          {inputs.map((input, idx) => (
-            <div key={idx} style={{ position: "relative", marginBottom: "20px" }}>
-              <Input
-                type={input.type}
-                placeholder={input.placeholder}
-                value={input.value}
-                onChange={(e) => input.setValue(e.target.value)}
-                style={{
-                  borderBottomColor: input.error ? theme.colors.dark.red : undefined,
-                }}
-              />
-              {input.error && (
-                <span
-                  style={{
-                    position: "absolute",
-                    top: "4px",
-                    right: "8px",
-                    color: theme.colors.dark.red,
-                    fontSize: "12px",
-                    fontWeight: "500",
-                  }}
-                >
-                  {input.message}
-                </span>
-              )}
-            </div>
-          ))}
+          <div style={{ position: "relative", marginBottom: "20px" }}>
+            <Input
+              type="email"
+              name="email"
+              placeholder={t("Email address")}
+              style={{
+                borderBottomColor: errors.email ? theme.colors.dark.red : undefined,
+              }}
+            />
+            {errors.email && <span style={errorStyle}>{t("Can’t be empty")}</span>}
+          </div>
 
-          <Button type="submit">{t("Kirish")}</Button>
+          <div style={{ position: "relative", marginBottom: "20px" }}>
+            <Input
+              type="password"
+              name="password"
+              placeholder={t("Password")}
+              style={{
+                borderBottomColor: errors.password ? theme.colors.dark.red : undefined,
+              }}
+            />
+            {errors.password && <span style={errorStyle}>{t("Can’t be empty")}</span>}
+          </div>
+
+          <Button type="submit">Kirish</Button>  
 
           <div
             style={{
               display: "flex",
               gap: "9px",
               margin: "0 auto",
-              alignItems: "center",
               justifyContent: "center",
+              marginTop: "12px",
             }}
           >
-            <p>{t("Hisobingiz yo‘qmi?")}</p>
-            <Link to={"/sign-up"}>{t("Ro‘yxatdan o‘tish")}</Link>
+            <p>{t("Don't have an account?")}</p>
+            <Link to="/sign-up">{t("Sign Up")}</Link>
           </div>
         </form>
       </Card>
     </div>
   );
 }
+
+const errorStyle = {
+  position: "absolute",
+  top: "4px",
+  right: "8px",
+  color: theme.colors.dark.red,
+  fontSize: "12px",
+  fontWeight: "500",
+};
 
 export default Login;
