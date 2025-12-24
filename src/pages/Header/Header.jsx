@@ -5,7 +5,7 @@ function Header() {
 
   return (
     <header style={styles.header}>
-      <div style={styles.logo}>Xolmatov A</div>
+      <div style={styles.logo}>Xolmatov Abdumajid</div>
       <nav style={styles.nav}>
         <div style={styles.navLink} onClick={() => navigate("/login")}>
           Login
@@ -30,6 +30,7 @@ const styles = {
   logo: {
     fontSize: "1.5rem",
     fontWeight: "700",
+    cursor: "pointer"
   },
   nav: {
     display: "flex",

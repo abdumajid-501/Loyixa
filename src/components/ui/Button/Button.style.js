@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { theme } from "../../../styles/theme";
 
 export const Button = styled.button`
-  width: 336px;
+  width: 100%;
   height: 48px;
   background-color: ${theme.colors.dark.red};
   border-radius: 6px;

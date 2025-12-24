@@ -9,6 +9,9 @@ import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase/firebase";
+import { signInWithPopup } from "firebase/auth";
+import { googleProvider } from "../../firebase/firebase";
+
 
 function SignUp() {
   const { t } = useTranslation();
@@ -20,6 +23,25 @@ function SignUp() {
     repeatPassword: false,
     repeatPasswordMessage: "",
   });
+
+  const handleGoogleLogin = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ uid: user.uid, email: user.email })
+    );
+
+    toast.success("Google orqali muvaffaqiyatli kirdingiz!");
+    navigate("/");
+  } catch (error) {
+    toast.error("Google login xatosi");
+    console.log(error);
+  }
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -123,6 +145,20 @@ function SignUp() {
           </div>
 
           <Button type="submit">{t("Sign Up Button")}</Button>
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            style={{
+              color: "#fff",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              backgroundColor: "#05427e",
+              padding: "14px"
+            }}
+          >
+            Google orqali kirish
+          </button>
+
 
           <div style={{ display: "flex", gap: "9px", margin: "0 auto", justifyContent: "center" }}>
             <p>{t("Already have an account?")}</p>
